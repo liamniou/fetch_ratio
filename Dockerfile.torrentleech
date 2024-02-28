@@ -1,0 +1,14 @@
+FROM python:3.9.6
+
+# Set the working directory
+WORKDIR /app
+
+COPY req.txt ./
+
+RUN pip install -r req.txt
+
+COPY ./torrentleech.py ./
+
+ENTRYPOINT ["python3"]
+
+CMD ["torrentleech.py"]

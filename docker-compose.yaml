@@ -1,0 +1,28 @@
+services:
+  iptorrents_exporter:
+    image: iptorrents_exporter
+    build:
+      context: .
+      dockerfile: Dockerfile.iptorrents
+    container_name: iptorrents_exporter
+    restart: unless-stopped
+    ports:
+      - 17501:17501
+    environment:
+      - PROFILE_URL=${IPTORRENTS_PROFILE_URL}
+      - EXPORTER_PORT=17501
+      - COOKIE_STRING=${IPTORRENTS_COOKIE}
+  torrentleech_exporter:
+    image: torrentleech_exporter
+    build:
+      context: .
+      dockerfile: Dockerfile.torrentleech
+    container_name: torrentleech_exporter
+    restart: unless-stopped
+    ports:
+      - 17502:17502
+    environment:
+      - PROFILE_URL=${TORRENTLEECH_PROFILE_URL}
+      - EXPORTER_PORT=17502
+      - FETCH_INTERVAL=900
+      - COOKIE_STRING=${TORRENTLEECH_COOKIE}

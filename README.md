@@ -1,0 +1,19 @@
+**Prometheus exporters that fetch ratio from iPtorrents and Torrentleech.**
+
+Create .env file and provide the following env variables:
+```
+IPTORRENTS_PROFILE_URL=...
+IPTORRENTS_COOKIE=...
+
+TORRENTLEECH_COOKIE=PHPSESSID=...
+TORRENTLEECH_PROFILE_URL=...
+```
+
+Optional env variables (adjust environment block in docker-compose.yaml):
+```
+- EXPORTER_PORT=...
+- FETCH_INTERVAL=...
+```
+
+Run:
+`docker-compose up -d`
