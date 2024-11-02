@@ -22,6 +22,7 @@ jobs:
       - name: Replace image:... in docker-compose.yaml with value of file latest_tag.txt
         run: |
           sed -i "s|image:.*|image: $(cat latest_tag.txt)|g" docker-compose.yaml
+          cat docker-compose.yaml
 
       - name: Deploy compose
         uses: sulthonzh/docker-remote-deployment-action@v0.1.2-beta
