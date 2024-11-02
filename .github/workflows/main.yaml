@@ -22,12 +22,12 @@ jobs:
       - name: Replace image:... in docker-compose.yaml with value of file latest_tag.txt
         run: |
           sed -i "s|image:.*|image: $(cat latest_tag.txt)|g" docker-compose.yaml
-          cat docker-compose.yaml
 
       - name: Deploy compose
         uses: sulthonzh/docker-remote-deployment-action@v0.1.2-beta
         with:
           remote_docker_host: lestar@lestar.ddns.net
+          remote_docker_port: 2831
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
           copy_stack_file: true
