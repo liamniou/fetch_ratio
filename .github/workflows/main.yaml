@@ -36,4 +36,4 @@ jobs:
           keep_files: 5
           args: up -d --remove-orphans
           docker_registry_username: liamnou
-          docker_registry_password: ${{ secrets.DOCKER_PASSWORD }}
+          docker_registry_password: ${{ secrets.DOCKERHUB_TOKEN }}
