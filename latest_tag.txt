@@ -1,1 +1,1 @@
-liamnou/fetch_ratio:sha-5033ccd
+liamnou/fetch_ratio:sha-316802
