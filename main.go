@@ -31,15 +31,16 @@ var (
 	uploadMetric   = prometheus.NewGauge(prometheus.GaugeOpts{Name: "upload_value_bytes", Help: "Value extracted from the webpage in bytes"})
 	downloadMetric = prometheus.NewGauge(prometheus.GaugeOpts{Name: "download_value_bytes", Help: "Value extracted from the webpage in bytes"})
 
+	// Use lowercase keys for easier, case-insensitive lookup
 	units = map[string]float64{
-		"TiB": 1 << 40, // TiB (Tebibytes)
-		"TB":  1e12,    // TB (Terabytes)
-		"GiB": 1 << 30, // GiB
-		"GB":  1e9,     // GB
-		"MiB": 1 << 20, // MiB
-		"MB":  1e6,     // MB
-		"KiB": 1 << 10, // KiB
-		"KB":  1e3,     // KB
+		"tib": 1 << 40, // TiB (Tebibytes)
+		"tb":  1e12,    // TB (Terabytes)
+		"gib": 1 << 30, // GiB
+		"gb":  1e9,     // GB
+		"mib": 1 << 20, // MiB
+		"mb":  1e6,     // MB
+		"kib": 1 << 10, // KiB
+		"kb":  1e3,     // KB
 	}
 )
 
@@ -63,18 +64,24 @@ func getEnvAsInt(key string, defaultValue int) int {
 }
 
 func ConvertHumanReadableSizeToBytes(input string) (float64, error) {
-	// Remove text in parentheses with parantheses
+	// Remove text in parentheses
 	input = regexp.MustCompile(`\([^)]*\)`).ReplaceAllString(input, "")
-	// Split the input and trim any whitespace
-	parts := strings.Fields(input)
-	if len(parts) != 2 {
-		return 0, fmt.Errorf("invalid input format")
+	// Normalize whitespace
+	input = strings.TrimSpace(input)
+
+	// Regex to find the first occurrence of a number followed by a unit.
+	// Supports formats like:
+	//   "435.96 GiB", "435.96GiB", "Uploaded: 435.96 GiB", "downloaded 304.22GB"
+	re := regexp.MustCompile(`(?i)(\d+(?:\.\d+)?)\s*([kmgt]i?b)`)
+	matches := re.FindStringSubmatch(input)
+	if len(matches) < 3 {
+		return 0, fmt.Errorf("invalid input format: %s", input)
 	}
 
-	valueStr := parts[0]
-	unit := parts[1]
+	valueStr := matches[1]
+	unit := strings.ToLower(matches[2]) // e.g. "gib" or "gb"
 
-	// Check if the unit is recognized
+	// Lookup multiplier using lowercase unit
 	multiplier, ok := units[unit]
 	if !ok {
 		return 0, fmt.Errorf("unrecognized unit: %s", unit)
@@ -144,7 +151,7 @@ func fetchValue() {
 
 	uploadText := strings.TrimSpace(doc.Find(ulElementSelector).Text())
 	downloadText := strings.TrimSpace(doc.Find(dlElementSelector).Text())
-	// If there are no space between value and unit, add a space
+	// If there are no space between value and unit, add a space (e.g. "435.96GiB" -> "435.96 GiB")
 	uploadText = regexp.MustCompile(`(\d)([A-Za-z])`).ReplaceAllString(uploadText, "$1 $2")
 	downloadText = regexp.MustCompile(`(\d)([A-Za-z])`).ReplaceAllString(downloadText, "$1 $2")
 
